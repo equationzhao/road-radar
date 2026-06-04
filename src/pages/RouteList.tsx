@@ -15,6 +15,22 @@ import { open } from "@tauri-apps/plugin-dialog";
 
 type View = "list" | "import-drop" | "import-parsed" | "import-form";
 
+// VAM-based time estimation for recreational road cyclists
+// Flat: ~25km/h, climbing: ~700m VAM (vertical ascent per hour)
+function estimateTime(distanceKm: number, elevationGain: number): string {
+  const FLAT_SPEED_KMH = 25;
+  const VAM_M_PER_HOUR = 700;
+
+  const flatHours = distanceKm / FLAT_SPEED_KMH;
+  const climbHours = elevationGain / VAM_M_PER_HOUR;
+  const totalHours = Math.max(flatHours, climbHours);
+
+  const h = Math.floor(totalHours);
+  const m = Math.round((totalHours - h) * 60);
+  if (h === 0) return `${m}min`;
+  return m > 0 ? `${h}h${m}min` : `${h}h`;
+}
+
 export function RouteList() {
   const [view, setView] = useState<View>("list");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -395,7 +411,7 @@ export function RouteList() {
                     <span className="font-display text-sm font-semibold text-emerald-400">解析完成</span>
                   </div>
                   <h3 className="font-display text-xl font-bold text-stone-100">{parsedRoute.name}</h3>
-                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                     <div className="rounded-lg bg-stone-800/40 px-3 py-2">
                       <div className="text-[10px] text-stone-600 font-display">距离</div>
                       <div className="font-mono text-lg text-stone-200">{parsedRoute.distance_km.toFixed(1)} km</div>
@@ -405,20 +421,16 @@ export function RouteList() {
                       <div className="font-mono text-lg text-emerald-400">+{parsedRoute.elevation_gain.toFixed(0)}m</div>
                     </div>
                     <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">最高海拔</div>
+                      <div className="font-mono text-lg text-stone-200">{parsedRoute.max_elevation.toFixed(0)}m</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
                       <div className="text-[10px] text-stone-600 font-display">下降</div>
                       <div className="font-mono text-lg text-sky-400">-{parsedRoute.elevation_loss.toFixed(0)}m</div>
                     </div>
                     <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                      <div className="text-[10px] text-stone-600 font-display">平均坡度</div>
-                      <div className="font-mono text-lg text-amber-400">{parsedRoute.avg_gradient.toFixed(1)}%</div>
-                    </div>
-                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                      <div className="text-[10px] text-stone-600 font-display">海拔范围</div>
-                      <div className="font-mono text-lg text-stone-200">{parsedRoute.min_elevation.toFixed(0)}-{parsedRoute.max_elevation.toFixed(0)}m</div>
-                    </div>
-                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                      <div className="text-[10px] text-stone-600 font-display">轨迹点数</div>
-                      <div className="font-mono text-lg text-stone-400">{parsedRoute.track_points.length}</div>
+                      <div className="text-[10px] text-stone-600 font-display">预估时间</div>
+                      <div className="font-mono text-lg text-amber-400">{estimateTime(parsedRoute.distance_km, parsedRoute.elevation_gain)}</div>
                     </div>
                   </div>
                   <div className="mt-4 flex items-center gap-3">
