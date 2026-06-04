@@ -3,7 +3,7 @@ use crate::models::{ElevationPoint, ParsedRoute, TrackPoint};
 
 const MAX_PROFILE_POINTS: usize = 500;
 const HAVENRS_EARTH_RADIUS_M: f64 = 6_371_000.0;
-const MIN_GRADIENT_DIST_M: f64 = 2.0;
+const GRADIENT_WINDOW_M: f64 = 50.0;
 
 pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
     let gpx: gpx::Gpx = gpx::read(content.as_bytes())
@@ -46,7 +46,7 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
     let mut elevation_loss = 0.0;
     let mut min_elev = points[0].elevation;
     let mut max_elev = points[0].elevation;
-    let mut gradients: Vec<f64> = Vec::new();
+    let mut cum_dists: Vec<f64> = vec![0.0];
 
     for i in 1..points.len() {
         let dist = haversine_m(
@@ -56,6 +56,7 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
             points[i].lng,
         );
         total_distance += dist;
+        cum_dists.push(total_distance);
 
         let elev_diff = points[i].elevation - points[i - 1].elevation;
         if elev_diff > 0.0 {
@@ -66,9 +67,21 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
 
         min_elev = min_elev.min(points[i].elevation);
         max_elev = max_elev.max(points[i].elevation);
+    }
 
-        if dist > MIN_GRADIENT_DIST_M {
-            gradients.push((elev_diff / dist) * 100.0);
+    // Rolling window gradient: for each point, find the nearest point ~50m ahead
+    let mut gradients: Vec<f64> = Vec::new();
+    let mut j = 0;
+    for i in 0..points.len() {
+        while j < points.len() && cum_dists[j] - cum_dists[i] < GRADIENT_WINDOW_M {
+            j += 1;
+        }
+        if j < points.len() {
+            let dist = cum_dists[j] - cum_dists[i];
+            let elev_diff = points[j].elevation - points[i].elevation;
+            if dist > 0.0 {
+                gradients.push((elev_diff / dist) * 100.0);
+            }
         }
     }
 
