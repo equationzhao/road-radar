@@ -10,6 +10,8 @@ import { GradientBar } from "../components/GradientBar";
 import { Badge } from "../components/ui/Badge";
 import { SettingsDrawer } from "../components/SettingsDrawer";
 import { allTags } from "../data/mock-routes";
+import { parseGpx, type ParsedRoute } from "../api/tauri";
+import { open } from "@tauri-apps/plugin-dialog";
 
 type View = "list" | "import-drop" | "import-parsed" | "import-form";
 
@@ -20,6 +22,9 @@ export function RouteList() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [importTags, setImportTags] = useState<string[]>([]);
   const [importRating, setImportRating] = useState(2);
+  const [parsedRoute, setParsedRoute] = useState<ParsedRoute | null>(null);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterTags, setFilterTags] = useState<string[]>([]);
   const [filterTagsAnd, setFilterTagsAnd] = useState(false);
@@ -55,15 +60,24 @@ export function RouteList() {
     return matchesSearch && matchesTags && matchesDiff && matchesMinDist && matchesMaxDist;
   });
 
-  const mockParsed = {
-    name: "苏州西山环线",
-    distance: 65.2,
-    elevationGain: 180,
-    maxGradient: 6.5,
-    elevationProfile: Array.from({ length: 80 }, (_, i) => ({
-      distance: i * 0.815,
-      elevation: 5 + Math.sin(i * 0.1) * 20 + Math.random() * 10,
-    })),
+  const handleFilePick = async () => {
+    setImportLoading(true);
+    setImportError(null);
+    try {
+      const file = await open({
+        multiple: false,
+        filters: [{ name: "GPX", extensions: ["gpx"] }],
+      });
+      if (typeof file === "string") {
+        const parsed = await parseGpx(file);
+        setParsedRoute(parsed);
+        setView("import-parsed");
+      }
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setImportLoading(false);
+    }
   };
 
   return (
@@ -333,21 +347,29 @@ export function RouteList() {
             </button>
 
             <div
-              onClick={() => setView("import-parsed")}
+              onClick={handleFilePick}
               className="group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-stone-700 bg-stone-900/30 py-20 transition-all duration-300 hover:border-amber-500/50 hover:bg-amber-500/5 cursor-pointer"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-stone-800/80 text-stone-500 transition-colors group-hover:bg-amber-500/10 group-hover:text-amber-400">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-              </div>
-              <p className="mt-4 font-display font-semibold text-stone-300 group-hover:text-amber-400 transition-colors">
-                拖放 GPX 文件到此处
-              </p>
-              <p className="mt-2 text-xs text-stone-600">或点击选择文件</p>
-              <p className="mt-4 text-[10px] text-stone-700">支持 .gpx 格式 · GPX 1.0 / 1.1</p>
+              {importLoading ? (
+                <p className="font-display text-sm text-amber-400 animate-pulse">解析中...</p>
+              ) : (
+                <>
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-stone-800/80 text-stone-500 transition-colors group-hover:bg-amber-500/10 group-hover:text-amber-400">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <p className="mt-4 font-display font-semibold text-stone-300 group-hover:text-amber-400 transition-colors">
+                    点击选择 GPX 文件
+                  </p>
+                  <p className="mt-2 text-xs text-stone-600">支持 .gpx 格式 · GPX 1.0 / 1.1</p>
+                </>
+              )}
+              {importError && (
+                <p className="mt-3 text-xs text-red-400">{importError}</p>
+              )}
             </div>
           </div>
         )}
@@ -365,46 +387,58 @@ export function RouteList() {
               返回
             </button>
 
-            <Card className="p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-display text-sm font-semibold text-emerald-400">解析完成</span>
-              </div>
-              <h3 className="font-display text-xl font-bold text-stone-100">{mockParsed.name}</h3>
-              <div className="mt-4 grid grid-cols-3 gap-4">
-                <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                  <div className="text-[10px] text-stone-600 font-display">距离</div>
-                  <div className="font-mono text-lg text-stone-200">{mockParsed.distance} km</div>
-                </div>
-                <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                  <div className="text-[10px] text-stone-600 font-display">爬升</div>
-                  <div className="font-mono text-lg text-emerald-400">+{mockParsed.elevationGain}m</div>
-                </div>
-                <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                  <div className="text-[10px] text-stone-600 font-display">最大坡度</div>
-                  <div className="font-mono text-lg text-red-400">{mockParsed.maxGradient}%</div>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center gap-3">
-                <Badge color="#f97316">起伏</Badge>
-                <span className="text-xs text-stone-600">系统自动分类</span>
-              </div>
-            </Card>
+            {parsedRoute && (
+              <>
+                <Card className="p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="font-display text-sm font-semibold text-emerald-400">解析完成</span>
+                  </div>
+                  <h3 className="font-display text-xl font-bold text-stone-100">{parsedRoute.name}</h3>
+                  <div className="mt-4 grid grid-cols-3 gap-4">
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">距离</div>
+                      <div className="font-mono text-lg text-stone-200">{parsedRoute.distance_km.toFixed(1)} km</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">爬升</div>
+                      <div className="font-mono text-lg text-emerald-400">+{parsedRoute.elevation_gain.toFixed(0)}m</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">最大坡度</div>
+                      <div className="font-mono text-lg text-red-400">{parsedRoute.max_gradient.toFixed(1)}%</div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center gap-3">
+                    <Badge color={
+                      parsedRoute.ride_type === "flat" ? "#0ea5e9" :
+                      parsedRoute.ride_type === "rolling" ? "#f59e0b" :
+                      parsedRoute.ride_type === "hilly" ? "#f97316" : "#ef4444"
+                    }>
+                      {parsedRoute.ride_type === "flat" ? "平路" :
+                       parsedRoute.ride_type === "rolling" ? "起伏" :
+                       parsedRoute.ride_type === "hilly" ? "丘陵" : "山地"}
+                    </Badge>
+                    <span className="text-xs text-stone-600">系统自动分类</span>
+                  </div>
+                </Card>
 
-            <MapPlaceholder className="h-48 w-full" routeColor="#f97316" />
+                <MapPlaceholder className="h-48 w-full" routeColor="#f97316" />
 
-            <Card className="p-5">
-              <h4 className="font-display font-semibold text-stone-200 mb-3">海拔剖面预览</h4>
-              <ElevationChart data={mockParsed.elevationProfile} height={160} color="#f97316" />
-              <div className="mt-2">
-                <GradientBar data={mockParsed.elevationProfile} />
-              </div>
-            </Card>
+                <Card className="p-5">
+                  <h4 className="font-display font-semibold text-stone-200 mb-3">海拔剖面预览</h4>
+                  <ElevationChart data={parsedRoute.elevation_profile} height={160} color="#f97316" />
+                  <div className="mt-2">
+                    <GradientBar data={parsedRoute.elevation_profile} />
+                  </div>
+                </Card>
 
-            <div className="flex gap-3">
-              <Button variant="secondary" onClick={() => setView("import-drop")}>取消</Button>
-              <Button onClick={() => setView("import-form")}>继续编辑</Button>
-            </div>
+                <div className="flex gap-3">
+                  <Button variant="secondary" onClick={() => { setView("import-drop"); setParsedRoute(null); }}>取消</Button>
+                  <Button onClick={() => setView("import-form")}>继续编辑</Button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -426,7 +460,7 @@ export function RouteList() {
                 <label className="block text-xs font-display text-stone-400 mb-1.5">路书名称</label>
                 <input
                   type="text"
-                  defaultValue={mockParsed.name}
+                  defaultValue={parsedRoute?.name ?? ""}
                   className="w-full rounded-lg border border-stone-800 bg-stone-900/60 px-3 py-2.5 text-sm text-stone-200 outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20"
                 />
               </div>
