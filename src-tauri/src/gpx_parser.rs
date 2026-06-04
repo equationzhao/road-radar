@@ -3,6 +3,7 @@ use crate::models::{ElevationPoint, ParsedRoute, TrackPoint};
 
 const MAX_PROFILE_POINTS: usize = 500;
 const HAVENRS_EARTH_RADIUS_M: f64 = 6_371_000.0;
+const MIN_GRADIENT_DIST_M: f64 = 2.0;
 
 pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
     let gpx: gpx::Gpx = gpx::read(content.as_bytes())
@@ -66,7 +67,7 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
         min_elev = min_elev.min(points[i].elevation);
         max_elev = max_elev.max(points[i].elevation);
 
-        if dist > 0.0 {
+        if dist > MIN_GRADIENT_DIST_M {
             gradients.push((elev_diff / dist) * 100.0);
         }
     }
