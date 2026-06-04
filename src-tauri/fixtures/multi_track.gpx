@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Road Radar Test" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>多日骑行</name></metadata>
+  <trk>
+    <name>第一天</name>
+    <trkseg>
+      <trkpt lat="31.23" lon="121.47"><ele>10</ele></trkpt>
+      <trkpt lat="31.24" lon="121.48"><ele>15</ele></trkpt>
+    </trkseg>
+  </trk>
+  <trk>
+    <name>第二天</name>
+    <trkseg>
+      <trkpt lat="31.24" lon="121.48"><ele>15</ele></trkpt>
+      <trkpt lat="31.25" lon="121.49"><ele>12</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

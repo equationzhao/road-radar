@@ -306,4 +306,75 @@ mod tests {
         let result = parse_gpx_content(&gpx).unwrap();
         assert!(result.elevation_profile.len() <= MAX_PROFILE_POINTS);
     }
+
+    // ---- Fixture tests (real GPX files) ----
+
+    #[test]
+    fn test_fixture_valid_flat() {
+        let content = include_str!("../fixtures/valid_flat.gpx");
+        let result = parse_gpx_content(content).unwrap();
+        assert_eq!(result.name, "太湖环湖骑行");
+        // 短距离下 gain_per_10km 偏高，rolling 分类合理
+        assert!(result.ride_type == "flat" || result.ride_type == "rolling");
+        assert!(result.distance_km > 0.0);
+        assert!(result.elevation_gain < 50.0);
+        assert!(result.created_at.is_some());
+        assert_eq!(result.track_points.len(), 8);
+        assert!((result.start_lat - 31.285).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_fixture_valid_mountain() {
+        let content = include_str!("../fixtures/valid_mountain.gpx");
+        let result = parse_gpx_content(content).unwrap();
+        assert_eq!(result.name, "莫干山爬坡挑战");
+        assert_eq!(result.ride_type, "mountainous");
+        assert!(result.elevation_gain > 500.0);
+        assert!(result.max_elevation > 600.0);
+        assert!(result.min_elevation < 50.0);
+        assert!(result.max_gradient > 10.0);
+        assert_eq!(result.track_points.len(), 15);
+    }
+
+    #[test]
+    fn test_fixture_no_tracks() {
+        let content = include_str!("../fixtures/no_tracks.gpx");
+        let result = parse_gpx_content(content);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("轨迹"));
+    }
+
+    #[test]
+    fn test_fixture_no_elevation() {
+        let content = include_str!("../fixtures/no_elevation.gpx");
+        let result = parse_gpx_content(content).unwrap();
+        // 无海拔数据，elevation 应为 0
+        assert!(result.track_points.iter().all(|p| p.elevation == 0.0));
+        assert_eq!(result.elevation_gain, 0.0);
+    }
+
+    #[test]
+    fn test_fixture_multi_track() {
+        let content = include_str!("../fixtures/multi_track.gpx");
+        let result = parse_gpx_content(content).unwrap();
+        // 只取第一条 track
+        assert_eq!(result.name, "多日骑行");
+        assert_eq!(result.track_points.len(), 2); // 第一条 track 只有 2 个点
+    }
+
+    #[test]
+    fn test_fixture_minimal() {
+        let content = include_str!("../fixtures/minimal.gpx");
+        let result = parse_gpx_content(content).unwrap();
+        assert_eq!(result.name, "未命名路书"); // metadata 无 name
+        assert_eq!(result.track_points.len(), 2);
+        assert!(result.distance_km > 0.0);
+    }
+
+    #[test]
+    fn test_fixture_invalid_xml() {
+        let content = include_str!("../fixtures/invalid.xml");
+        let result = parse_gpx_content(content);
+        assert!(result.is_err());
+    }
 }

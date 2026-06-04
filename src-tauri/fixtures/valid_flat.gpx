@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Road Radar Test" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>太湖环湖骑行</name>
+    <time>2026-05-18T06:30:00Z</time>
+  </metadata>
+  <trk>
+    <name>太湖环湖</name>
+    <trkseg>
+      <trkpt lat="31.2850" lon="120.7520"><ele>3</ele><time>2026-05-18T06:30:00Z</time></trkpt>
+      <trkpt lat="31.2860" lon="120.7550"><ele>4</ele><time>2026-05-18T06:31:00Z</time></trkpt>
+      <trkpt lat="31.2875" lon="120.7590"><ele>5</ele><time>2026-05-18T06:32:00Z</time></trkpt>
+      <trkpt lat="31.2900" lon="120.7640"><ele>3</ele><time>2026-05-18T06:33:00Z</time></trkpt>
+      <trkpt lat="31.2930" lon="120.7700"><ele>4</ele><time>2026-05-18T06:34:00Z</time></trkpt>
+      <trkpt lat="31.2965" lon="120.7770"><ele>6</ele><time>2026-05-18T06:35:00Z</time></trkpt>
+      <trkpt lat="31.3000" lon="120.7840"><ele>5</ele><time>2026-05-18T06:36:00Z</time></trkpt>
+      <trkpt lat="31.3040" lon="120.7920"><ele>4</ele><time>2026-05-18T06:37:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

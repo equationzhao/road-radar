@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Road Radar Test" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>莫干山爬坡挑战</name>
+    <time>2026-04-20T07:00:00Z</time>
+  </metadata>
+  <trk>
+    <name>莫干山主坡</name>
+    <trkseg>
+      <trkpt lat="30.5800" lon="119.9200"><ele>35</ele><time>2026-04-20T07:00:00Z</time></trkpt>
+      <trkpt lat="30.5810" lon="119.9210"><ele>85</ele><time>2026-04-20T07:02:00Z</time></trkpt>
+      <trkpt lat="30.5820" lon="119.9220"><ele>155</ele><time>2026-04-20T07:04:00Z</time></trkpt>
+      <trkpt lat="30.5830" lon="119.9230"><ele>240</ele><time>2026-04-20T07:06:00Z</time></trkpt>
+      <trkpt lat="30.5840" lon="119.9240"><ele>340</ele><time>2026-04-20T07:08:00Z</time></trkpt>
+      <trkpt lat="30.5850" lon="119.9250"><ele>430</ele><time>2026-04-20T07:10:00Z</time></trkpt>
+      <trkpt lat="30.5860" lon="119.9260"><ele>510</ele><time>2026-04-20T07:12:00Z</time></trkpt>
+      <trkpt lat="30.5870" lon="119.9270"><ele>580</ele><time>2026-04-20T07:14:00Z</time></trkpt>
+      <trkpt lat="30.5880" lon="119.9280"><ele>640</ele><time>2026-04-20T07:16:00Z</time></trkpt>
+      <trkpt lat="30.5890" lon="119.9290"><ele>690</ele><time>2026-04-20T07:18:00Z</time></trkpt>
+      <trkpt lat="30.5900" lon="119.9300"><ele>720</ele><time>2026-04-20T07:20:00Z</time></trkpt>
+      <trkpt lat="30.5910" lon="119.9310"><ele>680</ele><time>2026-04-20T07:22:00Z</time></trkpt>
+      <trkpt lat="30.5920" lon="119.9320"><ele>620</ele><time>2026-04-20T07:24:00Z</time></trkpt>
+      <trkpt lat="30.5930" lon="119.9330"><ele>550</ele><time>2026-04-20T07:26:00Z</time></trkpt>
+      <trkpt lat="30.5940" lon="119.9340"><ele>480</ele><time>2026-04-20T07:28:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
