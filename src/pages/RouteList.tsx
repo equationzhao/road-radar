@@ -395,7 +395,7 @@ export function RouteList() {
                     <span className="font-display text-sm font-semibold text-emerald-400">解析完成</span>
                   </div>
                   <h3 className="font-display text-xl font-bold text-stone-100">{parsedRoute.name}</h3>
-                  <div className="mt-4 grid grid-cols-3 gap-4">
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                     <div className="rounded-lg bg-stone-800/40 px-3 py-2">
                       <div className="text-[10px] text-stone-600 font-display">距离</div>
                       <div className="font-mono text-lg text-stone-200">{parsedRoute.distance_km.toFixed(1)} km</div>
@@ -405,8 +405,20 @@ export function RouteList() {
                       <div className="font-mono text-lg text-emerald-400">+{parsedRoute.elevation_gain.toFixed(0)}m</div>
                     </div>
                     <div className="rounded-lg bg-stone-800/40 px-3 py-2">
-                      <div className="text-[10px] text-stone-600 font-display">最大坡度</div>
-                      <div className="font-mono text-lg text-red-400">{parsedRoute.max_gradient.toFixed(1)}%</div>
+                      <div className="text-[10px] text-stone-600 font-display">下降</div>
+                      <div className="font-mono text-lg text-sky-400">-{parsedRoute.elevation_loss.toFixed(0)}m</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">平均坡度</div>
+                      <div className="font-mono text-lg text-amber-400">{parsedRoute.avg_gradient.toFixed(1)}%</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">海拔范围</div>
+                      <div className="font-mono text-lg text-stone-200">{parsedRoute.min_elevation.toFixed(0)}-{parsedRoute.max_elevation.toFixed(0)}m</div>
+                    </div>
+                    <div className="rounded-lg bg-stone-800/40 px-3 py-2">
+                      <div className="text-[10px] text-stone-600 font-display">轨迹点数</div>
+                      <div className="font-mono text-lg text-stone-400">{parsedRoute.track_points.length}</div>
                     </div>
                   </div>
                   <div className="mt-4 flex items-center gap-3">

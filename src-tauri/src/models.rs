@@ -12,7 +12,6 @@ pub struct ParsedRoute {
     pub start_lng: f64,
     pub end_lat: f64,
     pub end_lng: f64,
-    pub max_gradient: f64,
     pub avg_gradient: f64,
     pub ride_type: String,
     pub elevation_profile: Vec<ElevationPoint>,

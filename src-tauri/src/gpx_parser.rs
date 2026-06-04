@@ -86,13 +86,8 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
     }
 
     let distance_km = total_distance / 1000.0;
-    let max_gradient = gradients
-        .iter()
-        .copied()
-        .fold(f64::NEG_INFINITY, f64::max)
-        .abs();
     let avg_gradient = if !gradients.is_empty() {
-        gradients.iter().sum::<f64>() / gradients.len() as f64
+        gradients.iter().map(|g| g.abs()).sum::<f64>() / gradients.len() as f64
     } else {
         0.0
     };
@@ -123,7 +118,6 @@ pub fn parse_gpx_content(content: &str) -> Result<ParsedRoute, AppError> {
         start_lng: points[0].lng,
         end_lat: points.last().unwrap().lat,
         end_lng: points.last().unwrap().lng,
-        max_gradient,
         avg_gradient: avg_gradient.abs(),
         ride_type,
         elevation_profile,
@@ -346,7 +340,6 @@ mod tests {
         assert!(result.elevation_gain > 500.0);
         assert!(result.max_elevation > 600.0);
         assert!(result.min_elevation < 50.0);
-        assert!(result.max_gradient > 10.0);
         assert_eq!(result.track_points.len(), 15);
     }
 

@@ -22,7 +22,6 @@ export interface ParsedRoute {
   start_lng: number;
   end_lat: number;
   end_lng: number;
-  max_gradient: number;
   avg_gradient: number;
   ride_type: string;
   elevation_profile: ElevationPoint[];

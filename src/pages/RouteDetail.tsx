@@ -74,7 +74,7 @@ export function RouteDetail() {
         <MetricCard label="距离" value={`${route.distance} km`} />
         <MetricCard label="爬升" value={`+${route.elevationGain}m`} color="#10b981" />
         <MetricCard label="下降" value={`-${route.elevationLoss}m`} color="#0ea5e9" />
-        <MetricCard label="最大坡度" value={`${route.maxGradient}%`} color="#ef4444" />
+        <MetricCard label="平均坡度" value={`${route.avgGradient}%`} color="#f59e0b" />
         <MetricCard label="海拔范围" value={`${route.minElevation}-${route.maxElevation}m`} sub="最低-最高" />
         <MetricCard label="骑行次数" value={`${route.rideCount}`} sub={route.lastRidden || "未骑过"} />
       </div>
